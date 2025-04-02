@@ -9,15 +9,20 @@ pub fn celsius_to_fahrenheit(c: f64) -> f64 {
 #[cfg(test)]
 mod tests {
     use super::*;
+    
+    const EPSILON: f64 = 1e-6; // Set an epsilon value for floating-point comparison
+
     #[test]
-    fn fahrenheit_to_celsius_works() {
-        let result = fahrenheit_to_celsius(-459.67);
-        assert_eq!(result, -273.15);
+    fn test_c_to_f() {
+        let celsius = 0.0;
+        let fahrenheit = celsius_to_fahrenheit(celsius);
+        assert!((fahrenheit - 32.0).abs() < EPSILON); // Allow for small differences
     }
 
     #[test]
-    fn celsius_to_fahrenheit_works() {
-        let result = celsius_to_fahrenheit(0.0);
-        assert_eq!(result, 32.0);
+    fn test_f_to_c() {
+        let fahrenheit = 20.0;
+        let celsius = fahrenheit_to_celsius(fahrenheit);
+        assert!((celsius + 6.666666666666666).abs() < EPSILON); // Allow for small differences
     }
 }
