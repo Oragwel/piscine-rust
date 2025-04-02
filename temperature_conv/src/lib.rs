@@ -16,13 +16,13 @@ mod tests {
     fn test_c_to_f() {
         let celsius = 0.0;
         let fahrenheit = celsius_to_fahrenheit(celsius);
-        assert!((fahrenheit - 32.0).abs() < EPSILON); // Allow for small differences
+        assert!((fahrenheit - 32.0).abs() < EPSILON, "Expected 32.0 but got {}", fahrenheit);
     }
 
     #[test]
     fn test_f_to_c() {
         let fahrenheit = 20.0;
         let celsius = fahrenheit_to_celsius(fahrenheit);
-        assert!((celsius + 6.666666666666666).abs() < EPSILON); // Allow for small differences
+        assert!((celsius + 6.666666666666666).abs() < EPSILON, "Expected -6.666666666666666 but got {}", celsius);
     }
 }
