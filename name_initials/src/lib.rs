@@ -2,14 +2,14 @@ pub fn initials(names: Vec<&str>) -> Vec<String> {
     names
         .iter()
         .map(|name| {
-            name.split_whitespace() // Split the name into words
-                .filter_map(|part| part.chars().next()) // Get the first character of each part
-                .map(|c| format!("{}.", c)) // Append a dot to each initial
-                .collect::<Vec<String>>() // Collect into a vector of initials
-                .join(" ") // Join with a space between initials
+            name.split_whitespace() // Split into words
+                .map(|part| format!("{}.", part.chars().next().unwrap())) // Append `.` directly
+                .collect::<Vec<_>>() // Collect into a Vec
+                .join(" ") // Join efficiently
         })
-        .collect() // Collect into a Vec<String>
+        .collect()
 }
+
 
 
 #[cfg(test)]
