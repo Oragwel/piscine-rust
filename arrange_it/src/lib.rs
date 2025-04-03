@@ -1,13 +1,23 @@
 pub fn arrange_phrase(phrase: &str) -> String {
-    let mut words: Vec<&str> = phrase.split_whitespace().collect();
+    // Create a mutable vector to store words and their positions
+    let mut words_with_positions: Vec<(&str, usize)> = Vec::new();
 
-    words.sort_by_key(|word| {
-        // Extract the number from each word
-        word.chars()
-            .filter_map(|c| c.to_digit(10)) // Extract digits from the word
-            .next()                         // Get the first digit (position of the word)
-            .unwrap_or(0)                   // Default to 0 if no number is found (shouldn't happen)
-    });
+    // Extract words and their positions from the phrase
+    for word in phrase.split_whitespace() {
+        let position: usize = word.chars()
+            .filter(|c| c.is_numeric())
+            .collect::<String>()
+            .parse::<usize>()
+            .unwrap();
+        words_with_positions.push((word, position));
+    }
 
-    words.join(" ")
+    // Sort the words based on their positions
+    words_with_positions.sort_by_key(|&(_, position)| position);
+
+    // Collect the words to form the final phrase without numbers
+    words_with_positions.iter()
+        .map(|&(word, _)| word.chars().filter(|c| !c.is_numeric()).collect::<String>())
+        .collect::<Vec<String>>()
+        .join(" ")
 }
