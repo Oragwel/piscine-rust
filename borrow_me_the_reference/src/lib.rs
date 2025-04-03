@@ -1,49 +1,27 @@
 pub fn delete_and_backspace(s: &mut String) {
-    let mut final_string = String::new();
-    let mut counter = 0;
+    let s_copy = s.clone();
+    s.clear();
 
-    for character in s.chars() {
-        if counter != 0 && character != '+' {
-            counter -= 1;
-            continue;
-        }
-        match character {
-            '-' => {
-                final_string.pop(); // backspace
-            },
-            '+' => {
-                counter += 1; // delete
-            },
-            _ => {
-                final_string.push(character); // normal character
-            },
+    let mut skip_next = 0;
+    for v in s_copy.chars() {
+        if v == '-' {
+            s.pop();
+        } else if v == '+' {
+            skip_next += 1;
+        } else if skip_next > 0 {
+            skip_next -= 1;
+        } else {
+            s.push(v);
         }
     }
-
-    s.clear();
-    s.push_str(&final_string);
 }
 
-pub fn do_operations(v: &mut Vec<String>) {
-    for i in 0..v.len() {
-        let equation = &v[i];
+pub fn do_operations(v: &mut [String]) {
+    v.iter_mut().for_each(|equation| {
+        let (l, r) = equation.split_once(['+', '-']).unwrap();
+        let (l, r) = (l.parse::<i32>().unwrap(), r.parse::<i32>().unwrap());
 
-        if equation.contains('+') {
-            let operands: Vec<&str> = equation.split('+').collect();
-            if operands.len() == 2 {
-                let left = operands[0].trim().parse::<i32>().unwrap_or(0);
-                let right = operands[1].trim().parse::<i32>().unwrap_or(0);
-                let result = left + right;
-                v[i] = result.to_string();
-            }
-        } else if equation.contains('-') {
-            let operands: Vec<&str> = equation.split('-').collect();
-            if operands.len() == 2 {
-                let left = operands[0].trim().parse::<i32>().unwrap_or(0);
-                let right = operands[1].trim().parse::<i32>().unwrap_or(0);
-                let result = left - right;
-                v[i] = result.to_string();
-            }
-        }
-    }
+        let result = if equation.contains('+') { l + r } else { l - r };
+        *equation = result.to_string();
+    });
 }
