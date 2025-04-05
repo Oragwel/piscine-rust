@@ -12,8 +12,8 @@ pub enum Suit {
 impl Suit {
     // Associated function to get a random Suit
     pub fn random() -> Suit {
-        let mut rng = rand::rng();
-        match rng.random_range(1..=4) {
+        let mut rng = rand::thread_rng();
+        match rng.gen_range(1..=4) {
             1 => Suit::Heart,
             2 => Suit::Diamond,
             3 => Suit::Spade,
@@ -47,10 +47,10 @@ pub enum Rank {
 impl Rank {
     // Associated function to get a random Rank
     pub fn random() -> Rank {
-        let mut rng = rand::rng();
-        match rng.random_range(1..=13) {
+        let mut rng = rand::thread_rng();
+        match rng.gen_range(1..=13) {
             1 => Rank::Ace,
-            2..=10 => Rank::Number(rng.random_range(2..=10)),
+            2..=10 => Rank::Number(rng.gen_range(2..=10)),
             11 => Rank::Jack,
             12 => Rank::Queen,
             13 => Rank::King,
@@ -79,6 +79,6 @@ pub struct Card {
 }
 
 // Function to check if the card is the Ace of Spades
-pub fn winner_card(card: Card) -> bool {
+pub fn winner_card(card: &Card) -> bool {
     matches!(card.rank, Rank::Ace) && matches!(card.suit, Suit::Spade)
 }
