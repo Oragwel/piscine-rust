@@ -1,4 +1,4 @@
-use chrono::Local;
+use chrono::Utc;
 
 #[derive(Debug, Eq, PartialEq)]
 pub struct FormError {
@@ -9,10 +9,9 @@ pub struct FormError {
 
 impl FormError {
     pub fn new(field_name: &'static str, field_value: String, err: &'static str) -> Self {
-        let date = Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
-        Self {
+        FormError {
             form_values: (field_name.to_string(), field_value),
-            date,
+            date: Utc::now().format("%Y-%m-%d %H:%M:%S").to_string(),
             err: err.to_string(),
         }
     }
@@ -26,12 +25,8 @@ pub struct Form {
 
 impl Form {
     pub fn validate(&self) -> Result<(), FormError> {
-        if self.name.is_empty() {
-            return Err(FormError::new(
-                "first_name",
-                self.name.clone(),
-                "Username is empty",
-            ));
+        if self.name.trim().is_empty() {
+            return Err(FormError::new("name", self.name.clone(), "Username is empty"));
         }
 
         if self.password.len() < 8 {
@@ -47,7 +42,7 @@ impl Form {
         let has_symbol = self
             .password
             .chars()
-            .any(|c| !c.is_ascii_alphanumeric() && !c.is_whitespace());
+            .any(|c| !c.is_ascii_alphanumeric());
 
         if !(has_alpha && has_digit && has_symbol) {
             return Err(FormError::new(
