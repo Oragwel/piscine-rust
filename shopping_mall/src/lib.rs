@@ -4,6 +4,7 @@ pub use mall::{Mall, Guard, Floor, Store, Employee};
 
 use std::collections::HashMap;
 
+
 pub fn biggest_store(mall: &Mall) -> Option<(&String, &Store)> {
     mall.floors
         .values()
