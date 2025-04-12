@@ -1,29 +1,52 @@
 pub fn pig_latin(text: &str) -> String {
-    let vowels = "aeiou";
-
-    // Handle the case where the word starts with a vowel
-    if vowels.contains(text.chars().next().unwrap()) {
-        return format!("{}ay", text);
+    println!("{}", text);
+    fn is_vowel(c: char) -> bool {
+        match c {
+                'a' | 'e' | 'i' | 'o' | 'u' | 'A' | 'E' | 'I' | 'O' | 'U' => true,
+                _ => false,
+            }
     }
-
-    // Handle words starting with consonants
-    let mut chars = text.chars();
-    let mut prefix = String::new();
-
-    // Handle "qu" case
-    if chars.clone().take(2).collect::<String>() == "qu" {
-        prefix = chars.take(2).collect();
-        return format!("{}ay", text[2..].to_string() + &prefix);
-    }
-
-    // Handle consonant to first vowel case
-    for (i, ch) in text.chars().enumerate() {
-        if vowels.contains(ch) {
-            let rest_of_word = &text[i..];
-            return format!("{}{}ay", &text[0..i], rest_of_word);
+    let mut new_string = text.to_string();
+    let mut next_char = false;
+    loop {
+        for (i, char) in text.chars().enumerate() {
+            if next_char && char == 'q' {
+                new_string.remove(0);
+                new_string.push(char);
+                continue
+            }
+            if next_char && char == 'u' {
+                new_string.remove(0);
+                new_string.push(char);
+                next_char = false;
+            }
+            if !is_vowel(char) && text.len() > i + 2 && &text[i+1..i+3] == "qu" {
+                new_string.remove(0);
+                new_string.push(char);
+                next_char = true;
+            }else if i == 0 && is_vowel(char){
+                break;
+            }else if !is_vowel(char) {
+                new_string.remove(0);
+                new_string.push(char);
+                continue;
+            } else { 
+                break
+            }
         }
+        break
     }
-
-    text.to_string()  // Fallback if no vowel is found (unlikely for normal words)
+    new_string.push('a');
+    new_string.push('y');
+    return new_string
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn it_works() {
+        println!("{}", pig_latin(&String::from("queen")));
+    }
+}
