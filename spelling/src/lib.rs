@@ -40,11 +40,11 @@ pub fn spell(mut n: u64) -> String {
             if chunk >= 11 && chunk <= 19 {
                 chunk_str.push_str(teens[chunk - 10]);
             } else {
-                if chunk >= 10 {
+                if chunk >= 20 {
                     chunk_str.push_str(tens[chunk / 10]);
                     chunk %= 10;
                     if chunk > 0 {
-                        chunk_str.push_str(" ");
+                        chunk_str.push_str("-");
                     }
                 }
                 if chunk > 0 {
