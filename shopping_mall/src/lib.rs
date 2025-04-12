@@ -1,64 +1,73 @@
 pub mod mall;
-pub use guard::Guard;
-pub use mall::floor::store::employee::Employee;
-pub use mall::floor::store::*;
-pub use mall::floor::*;
-pub use mall::*;
 
-pub fn biggest_store(mall: Mall) -> Store {
+pub use mall::{Mall, Guard, Floor, Store, Employee};
+
+use std::collections::HashMap;
+
+
+pub fn biggest_store(mall: &Mall) -> Option<(&String, &Store)> {
     mall.floors
-        .iter()
-        .flat_map(|floor| &floor.stores)
-        .max_by_key(|store| store.square_meters)
-        .cloned()
-        .unwrap()
+        .values()
+        .flat_map(|floor| floor.stores.iter())
+        .max_by_key(|(_, store)| store.square_meters)
 }
 
-pub fn highest_paid_employee(mall: Mall) -> Vec<Employee> {
-    let mall_iter = mall
-        .floors
-        .iter()
-        .flat_map(|floor| floor.stores.clone())
-        .flat_map(|store| store.employees);
+pub fn highest_paid_employee(mall: &Mall) -> Vec<&Employee> {
+    let all_employees: Vec<&Employee> = mall.floors
+        .values()
+        .flat_map(|floor| floor.stores.values())
+        .flat_map(|store| store.employees.values())
+        .collect();
 
-    let highest_slary = mall_iter.clone().fold(f64::MIN, |acc, x| acc.max(x.salary));
-    mall_iter.filter(|e| e.salary == highest_slary).collect()
-}
-
-pub fn nbr_of_employees(mall: Mall) -> usize {
-    mall.guards.len()
-        + mall
-            .floors
-            .iter()
-            .flat_map(|floor| &floor.stores)
-            .fold(0_usize, |acc, x| acc + x.employees.len())
-}
-
-pub fn check_for_securities(mall: &mut Mall, guards: Vec<Guard>) {
-    let mut g = guards.clone();
-    let mut count = 0_usize;
-    let s = mall
-        .floors
-        .iter()
-        .flat_map(|floor| &floor.stores)
-        .fold(0_u64, |acc, x| acc + x.square_meters);
-    while count * 200 < s as usize && g.len() > 0 {
-        count += 1;
-        mall.guards.push(g[0].clone());
-        g.remove(0);
+    if let Some(max_salary) = all_employees.iter().map(|e| e.salary).max_by(|a, b| a.partial_cmp(b).unwrap()) {
+        all_employees
+            .into_iter()
+            .filter(|e| e.salary == max_salary)
+            .collect()
+    } else {
+        vec![]
     }
 }
+
+pub fn nbr_of_employees(mall: &Mall) -> usize {
+    let employee_count = mall.floors
+        .values()
+        .flat_map(|floor| floor.stores.values())
+        .map(|store| store.employees.len())
+        .sum::<usize>();
+    employee_count + mall.guards.len()
+}
+
+pub fn check_for_securities(mall: &mut Mall, mut guard_pool: HashMap<String, Guard>) {
+    let total_area: u64 = mall.floors
+        .values()
+        .flat_map(|floor| floor.stores.values())
+        .map(|store| store.square_meters)
+        .sum();
+
+    let required_guards = (total_area as f64 / 200.0).ceil() as usize;
+    let current_guards = mall.guards.len();
+
+    let guards_needed = required_guards.saturating_sub(current_guards);
+
+    for _ in 0..guards_needed {
+        if let Some((name, guard)) = guard_pool.iter().next().map(|(k, v)| (k.clone(), v.clone())) {
+            mall.hire_guard(name.clone(), guard);
+            guard_pool.remove(&name);
+        }
+    }
+}
+
 pub fn cut_or_raise(mall: &mut Mall) {
-    for floor in mall.floors.iter_mut() {
-        for store in floor.stores.iter_mut() {
-            for employee in store.employees.iter_mut() {
-                let w_h = employee.working_hours.1 - employee.working_hours.0;
-                let percentage = employee.salary * 0.1;
-                if w_h > 10 {
-                    employee.salary += percentage
-                } else {
-                    employee.salary -= percentage
-                }
+    for store in mall.floors
+        .values_mut()
+        .flat_map(|floor| floor.stores.values_mut()) {
+        for employee in store.employees.values_mut() {
+            let hours = employee.working_hours.1 - employee.working_hours.0;
+            if hours >= 10 {
+                employee.salary *= 1.10;
+            } else {
+                employee.salary *= 0.90;
             }
         }
     }
