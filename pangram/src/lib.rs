@@ -1,14 +1,13 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+use std::collections::HashSet;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+pub fn is_pangram(s: &str) -> bool {
+    let mut letters = HashSet::new();
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
+    for c in s.chars() {
+        if c.is_ascii_alphabetic() {
+            letters.insert(c.to_ascii_lowercase());
+        }
     }
+
+    letters.len() == 26
 }
