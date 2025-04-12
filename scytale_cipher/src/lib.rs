@@ -1,21 +1,12 @@
 pub fn scytale_cipher(message: String, i: u32) -> String {
-    let i = i as usize;
-    let mut chars: Vec<char> = message.chars().collect();
-    
-    // Pad the message with spaces to fill the last row if necessary
-    let remainder = chars.len() % i;
-    if remainder != 0 {
-        chars.extend(vec![' '; i - remainder]);
-    }
-
-    let rows = chars.len() / i;
-    let mut result = String::with_capacity(chars.len());
-
-    for col in 0..i {
-        for row in 0..rows {
-            result.push(chars[row * i + col]);
-        }
-    }
-
-    result
+    let padded_message = format!(
+        "{:<width$}",
+        message,
+        width = (message.len() as f32 / i as f32).ceil() as usize * i as usize
+    );
+    (0..i)
+        .flat_map(|j| padded_message.chars().skip(j as usize).step_by(i as usize))
+        .collect::<String>()
+        .trim()
+        .to_string()
 }
