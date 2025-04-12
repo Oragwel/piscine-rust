@@ -1,12 +1,13 @@
-pub fn num_to_ordinal(x: u32) -> String {
-    let suffix = match x % 100 {
-        11 | 12 | 13 => "th",
-        _ => match x % 10 {
-            1 => "st",
-            2 => "nd",
-            3 => "rd",
-            _ => "th",
-        },
-    };
-    format!("{}{}", x, suffix)
+use std::collections::HashSet;
+
+pub fn is_pangram(s: &str) -> bool {
+    let mut letters = HashSet::new();
+
+    for c in s.chars() {
+        if c.is_ascii_alphabetic() {
+            letters.insert(c.to_ascii_lowercase());
+        }
+    }
+
+    letters.len() == 26
 }
