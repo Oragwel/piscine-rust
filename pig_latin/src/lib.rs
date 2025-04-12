@@ -27,12 +27,3 @@ pub fn pig_latin(text: &str) -> String {
     text.to_string()  // Fallback if no vowel is found (unlikely for normal words)
 }
 
-fn main() {
-    println!("{}", pig_latin(&String::from("igloo")));  // iglooay
-    println!("{}", pig_latin(&String::from("apple")));  // appleay
-    println!("{}", pig_latin(&String::from("hello")));  // ellohay
-    println!("{}", pig_latin(&String::from("square"))); // aresquay
-    println!("{}", pig_latin(&String::from("xenon")));  // enonxay
-    println!("{}", pig_latin(&String::from("chair")));  // airchay
-    println!("{}", pig_latin(&String::from("queen")));  // ueenqay
-}
