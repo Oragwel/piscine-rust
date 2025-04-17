@@ -8,6 +8,7 @@ use std::collections::HashMap;
 pub mod messenger;
 pub use messenger::{Logger, Tracker};
 
+#[derive(Clone, Debug)]
 pub struct Worker {
     pub track_value: Rc<RefCell<usize>>,
     pub mapped_messages: RefCell<HashMap<String, String>>,
