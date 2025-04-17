@@ -1,7 +1,7 @@
 // ref_cell/src/messenger.rs
 
-use std::cell::RefCell;
 use std::rc::Rc;
+use std::cell::RefCell;
 
 pub trait Logger {
     fn warning(&self, msg: &str);
