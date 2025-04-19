@@ -1,7 +1,5 @@
-// ref_cell/src/messenger.rs
-
-use std::rc::Rc;
-use std::cell::RefCell;
+pub use std::cell::RefCell;
+pub use std::rc::Rc;
 
 pub trait Logger {
     fn warning(&self, msg: &str);
@@ -9,37 +7,46 @@ pub trait Logger {
     fn error(&self, msg: &str);
 }
 
+#[derive(Debug, Clone)]
 pub struct Tracker<'a, T: Logger> {
     logger: &'a T,
+    value: RefCell<usize>,
     max: usize,
 }
 
-impl<'a, T: Logger> Tracker<'a, T> {
-    pub fn new(logger: &'a T, max: usize) -> Self {
-        Tracker { logger, max }
+impl<'a, T> Tracker<'a, T>
+where
+    T: Logger,
+{
+    pub fn new(logger: &T, max: usize) -> Tracker<T> {
+        Tracker {
+            logger,
+            value: RefCell::new(0),
+            max,
+        }
     }
 
-    pub fn peek(&self, value: &Rc<RefCell<usize>>) {
-    let count = Rc::strong_count(value);
-    let percentage = ((count as f64 / self.max as f64) * 100.0).round();
-    self.logger.info(&format!(
-        "you are using up to {:.0}% of your quota",
-        percentage
-    ));
-}
+    pub fn set_value(&self, value: &Rc<usize>) {
+        self.value.replace(Rc::strong_count(value));
+        let percentage_of_max = convert_percentage(self.max, Rc::strong_count(&value));
 
-pub fn set_value(&self, value: &Rc<RefCell<usize>>) {
-    let count = Rc::strong_count(value);
-    let percentage = ((count as f64 / self.max as f64) * 100.0).round();
+        if percentage_of_max >= 100 {
+            self.logger.error("Error: you are over your quota!");
+            return;
+        } else if percentage_of_max >= 70 {
+            self.logger
+                .warning(&format!("Warning: you have used up over {percentage_of_max}% of your quota! Proceeds with precaution"));
+        }
+    }
 
-    if percentage >= 100.0 {
-        self.logger.error("you are over your quota!");
-    } else if percentage >= 70.0 {
-        self.logger.warning(&format!(
-            "you have used up over {:.0}% of your quota! Proceeds with precaution",
-            percentage
-        ));
+    pub fn peek(&self, value: &Rc<usize>) {
+        let percentage_of_max = convert_percentage(self.max, Rc::strong_count(&value));
+        self.logger.info(&format!(
+            "Info: you are using up to {percentage_of_max}% of your quota"
+        ))
     }
 }
-}
 
+fn convert_percentage(max: usize, v: usize) -> usize {
+    (100 * v) / max
+}
