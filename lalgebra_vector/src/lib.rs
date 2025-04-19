@@ -1,4 +1,4 @@
-use lalgebra_scalar::Scalar;
+use lalgebra_vector::Vector;
 
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Vector<T: Scalar<Item = T>>(pub Vec<T>);
