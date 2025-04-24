@@ -1,7 +1,8 @@
 pub mod ops;
 pub mod mult;
 
-use crate::traits::Scalar;
+use lalgebra_scalar::Scalar;
+
 
 #[derive(Debug, PartialEq)]
 pub struct Matrix<T>(pub Vec<Vec<T>>);
