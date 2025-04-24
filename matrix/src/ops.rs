@@ -1,11 +1,17 @@
-use crate::{Matrix, Scalar};
-use std::ops::Add;
+use std::ops::{Add, Sub};
+use crate::Matrix;
+use crate::Scalar;
 
-impl<T: Scalar<Item = T> + std::ops::Add<Output = T>> Add for Matrix<T> {
+impl<T> Add for Matrix<T>
+where
+    T: Scalar<Item = T> + Add<Output = T> + Clone,
+{
     type Output = Option<Self>;
 
     fn add(self, other: Self) -> Self::Output {
-        if self.0[0].len() != other.0[0].len() || self.0.len() != other.0.len() {
+        if self.number_of_rows() != other.number_of_rows()
+            || self.number_of_columns() != other.number_of_columns()
+        {
             return None;
         }
 
@@ -23,13 +29,16 @@ impl<T: Scalar<Item = T> + std::ops::Add<Output = T>> Add for Matrix<T> {
     }
 }
 
-use std::ops::Sub;
-
-impl<T: Scalar<Item = T> + Sub<Output = T>> Sub for Matrix<T> {
+impl<T> Sub for Matrix<T>
+where
+    T: Scalar<Item = T> + Sub<Output = T> + Clone,
+{
     type Output = Option<Self>;
 
     fn sub(self, other: Self) -> Self::Output {
-        if self.0[0].len() != other.0[0].len() || self.0.len() != other.0.len() {
+        if self.number_of_rows() != other.number_of_rows()
+            || self.number_of_columns() != other.number_of_columns()
+        {
             return None;
         }
 

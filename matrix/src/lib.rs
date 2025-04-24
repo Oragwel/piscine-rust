@@ -1,66 +1,44 @@
-use lalgebra_scalar::Scalar;
-mod mult;
-mod ops;
+pub mod ops;
+pub mod mult;
 
-#[derive(Debug, Eq, PartialEq, Clone)]
+use crate::traits::Scalar;
+
+#[derive(Debug, PartialEq)]
 pub struct Matrix<T>(pub Vec<Vec<T>>);
 
-impl<T: Scalar<Item = T>> Matrix<T> {
-    pub fn new() -> Matrix<T> {
-        Matrix(vec![Vec::new()])
+impl<T> Matrix<T>
+where
+    T: Scalar<Item = T> + Clone,
+{
+    pub fn new() -> Self {
+        Matrix(vec![vec![]])
     }
-    // It returns the zero matrix of the size given by the row and
-    // column parameters
-    pub fn zero(row: usize, col: usize) -> Matrix<T> {
-        let mut matrix = Matrix(Vec::new());
+
+    pub fn from_elem(row: usize, col: usize, value: T) -> Self {
+        let mut matrix = vec![];
         for _ in 0..row {
-            matrix.0.push(vec![T::zero(); col]);
+            matrix.push(vec![value.clone(); col]);
         }
-        matrix
+        Self(matrix)
     }
 
-    pub fn identity(n: usize) -> Matrix<T> {
-        let mut matrix = Matrix::new();
-        for y in 0..n {
-            if y > 0 {
-                matrix.0.push(Vec::new());
-            }
-            for x in 0..n {
-                if y == x {
-                    matrix.0[y].push(T::one());
-                } else {
-                    matrix.0[y].push(T::zero());
-                }
-            }
+    pub fn number_of_rows(&self) -> usize {
+        self.0.len()
+    }
+
+    pub fn number_of_columns(&self) -> usize {
+        if self.0.is_empty() {
+            0
+        } else {
+            self.0[0].len()
         }
-        matrix
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn zero_property() {
-        let matrix: Matrix<u32> = Matrix::zero(3, 4);
-        let expected: Matrix<u32> =
-            Matrix(vec![vec![0, 0, 0, 0], vec![0, 0, 0, 0], vec![0, 0, 0, 0]]);
-        assert_eq!(matrix, expected);
-
-        let matrix: Matrix<u32> = Matrix::zero(2, 2);
-        let expected: Matrix<u32> = Matrix(vec![vec![0, 0], vec![0, 0]]);
-        assert_eq!(matrix, expected);
     }
 
-    #[test]
-    fn identy_matrix() {
-        let matrix: Matrix<u32> = Matrix::identity(2);
-        let expected: Matrix<u32> = Matrix(vec![vec![1, 0], vec![0, 1]]);
-        assert_eq!(matrix, expected);
+    pub fn row(&self, n: usize) -> Vec<T> {
+        self.0[n].clone()
+    }
 
-        let matrix: Matrix<u32> = Matrix::identity(3);
-        let expected: Matrix<u32> = Matrix(vec![vec![1, 0, 0], vec![0, 1, 0], vec![0, 0, 1]]);
-        assert_eq!(matrix, expected);
+    pub fn col(&self, n: usize) -> Vec<T> {
+        self.0.iter().map(|row| row[n].clone()).collect()
     }
 }
