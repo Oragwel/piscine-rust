@@ -1,17 +1,19 @@
-use std::ops::{Add, Sub};
-use crate::Matrix;
-use crate::Scalar;
+// In this exercise you will define the basic operations with a matrix
+// starting by implementing the `std::ops::Add` trait
 
-impl<T> Add for Matrix<T>
-where
-    T: Scalar<Item = T> + Add<Output = T> + Clone,
-{
+// Define the operation + (by defining the trait std::ops::Add) for
+// two matrices remember that two matrices can only be added if they
+// have the same size. Therefore the add method must handle the
+// possibility of failure by returning an Option<T>
+
+use crate::{Matrix, Scalar};
+use std::ops::Add;
+
+impl<T: Scalar<Item = T> + std::ops::Add<Output = T>> Add for Matrix<T> {
     type Output = Option<Self>;
 
     fn add(self, other: Self) -> Self::Output {
-        if self.number_of_rows() != other.number_of_rows()
-            || self.number_of_columns() != other.number_of_columns()
-        {
+        if self.0[0].len() != other.0[0].len() || self.0.len() != other.0.len() {
             return None;
         }
 
@@ -29,16 +31,13 @@ where
     }
 }
 
-impl<T> Sub for Matrix<T>
-where
-    T: Scalar<Item = T> + Sub<Output = T> + Clone,
-{
+use std::ops::Sub;
+
+impl<T: Scalar<Item = T> + Sub<Output = T>> Sub for Matrix<T> {
     type Output = Option<Self>;
 
     fn sub(self, other: Self) -> Self::Output {
-        if self.number_of_rows() != other.number_of_rows()
-            || self.number_of_columns() != other.number_of_columns()
-        {
+        if self.0[0].len() != other.0[0].len() || self.0.len() != other.0.len() {
             return None;
         }
 
