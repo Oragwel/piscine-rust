@@ -1,11 +1,3 @@
-// In this exercise you will define the basic operations with a matrix
-// starting by implementing the `std::ops::Add` trait
-
-// Define the operation + (by defining the trait std::ops::Add) for
-// two matrices remember that two matrices can only be added if they
-// have the same size. Therefore the add method must handle the
-// possibility of failure by returning an Option<T>
-
 use crate::{Matrix, Scalar};
 use std::ops::Add;
 
