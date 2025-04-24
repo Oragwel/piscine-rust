@@ -1,13 +1,13 @@
-#[derive(Debug)]
-pub struct Person<'a> {
-    pub name: &'a str,
+#[derive(Debug, Clone)]  // Derive the Clone trait for Person
+pub struct Person {
+    pub name: String,  // Change `name` to be a `String` instead of `&str`
     pub age: u8,
 }
 
-impl<'a> Person<'a> {
-    pub fn new(name: &'a str) -> Person<'a> {
+impl Person {
+    pub fn new(name: &str) -> Person {
         Person {
-            name,
+            name: name.to_string(),  // Convert `&str` to `String`
             age: 0,
         }
     }
