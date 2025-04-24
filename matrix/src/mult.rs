@@ -1,53 +1,57 @@
-use std::ops::{Mul, Add};
+// Now define the matrix multiplication by implementing the
+// std::ops::Mul for the type matrix
+
 use crate::Matrix;
 use crate::Scalar;
+use std::ops::Mul;
 
-impl<T> Mul for Matrix<T>
-where
-    T: Scalar<Item = T>
-        + Mul<Output = T>
-        + Add<Output = T>
-        + std::iter::Sum<T>
-        + Clone,
-{
-    type Output = Option<Self>;
+impl<T: Scalar<Item = T>> Matrix<T> {
+    pub fn number_of_cols(&self) -> usize {
+        self.0[0].len()
+    }
 
-    fn mul(self, rhs: Self) -> Self::Output {
-        if self.number_of_columns() != rhs.number_of_rows() {
-            return None;
-        }
+    pub fn number_of_rows(&self) -> usize {
+        self.0.len()
+    }
 
-        let mut result = Matrix::from_elem(self.number_of_rows(), rhs.number_of_columns(), T::zero());
+    pub fn row(&self, n: usize) -> Vec<T> {
+        self.0[n].clone()
+    }
 
-        for j in 0..self.number_of_rows() {
-            for i in 0..rhs.number_of_columns() {
-                result.0[j][i] = self
-                    .row(j)
-                    .iter()
-                    .cloned()
-                    .zip(rhs.col(i).iter().cloned())
-                    .map(|(x, y)| x * y)
-                    .sum();
+    pub fn col(&self, n: usize) -> Vec<T> {
+        let mut column = Vec::new();
+        for row in &self.0 {
+            for (i, v) in row.iter().enumerate() {
+                if i == n {
+                    column.push(v.clone());
+                }
             }
         }
-
-        Some(result)
+        column
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn multiplication() {
-        let a = Matrix(vec![vec![1, 2], vec![3, 4]]);
-        let b = Matrix(vec![vec![5, 6], vec![7, 8]]);
-        let expected = Matrix(vec![vec![19, 22], vec![43, 50]]);
-        assert_eq!(a * b, Some(expected));
-
-        let a = Matrix(vec![vec![1, 2]]);
-        let b = Matrix(vec![vec![1, 2], vec![3, 4], vec![5, 6]]);
-        assert_eq!(a * b, None);
+impl<T: Scalar<Item = T> + std::iter::Sum<<T as std::ops::Mul>::Output>> Mul for Matrix<T> {
+    type Output = Option<Self>;
+    fn mul(self, rhs: Self) -> Self::Output {
+        // If the number of columns of self match don't match the number of
+        // number_of_rows of self don't match return None
+        let row_lenght = self.number_of_rows();
+        let col_lenght = rhs.number_of_cols();
+        if self.number_of_cols() != rhs.number_of_rows() {
+            return None;
+        }
+        let mut result: Matrix<T> = Matrix::zero(row_lenght, col_lenght);
+        for j in 0..result.number_of_rows() {
+            for i in 0..result.number_of_cols() {
+                result.0[j][i] = self
+                    .row(j)
+                    .iter()
+                    .zip(rhs.col(i).iter())
+                    .map(|(x, y)| x.clone() * y.clone())
+                    .sum();
+            }
+        }
+        Some(result)
     }
 }

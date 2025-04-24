@@ -1,53 +1,38 @@
-// matrix/src/lib.rs
 use lalgebra_scalar::Scalar;
-pub struct Matrix<T>(Vec<Vec<T>>);
+mod mult;
+mod ops;
 
-impl<T: Scalar<Item = T> + Clone> Matrix<T> {
-    // Constructor to create a new Matrix from elements
-    pub fn from_elem(row: usize, col: usize, value: T) -> Self {
-        let mut matrix = Vec::with_capacity(row);
+#[derive(Debug, Eq, PartialEq, Clone)]
+pub struct Matrix<T>(pub Vec<Vec<T>>);
+
+impl<T: Scalar<Item = T>> Matrix<T> {
+    pub fn new() -> Matrix<T> {
+        Matrix(vec![Vec::new()])
+    }
+    // It returns the zero matrix of the size given by the row and
+    // column parameters
+    pub fn zero(row: usize, col: usize) -> Matrix<T> {
+        let mut matrix = Matrix(Vec::new());
         for _ in 0..row {
-            matrix.push(vec![value.clone(); col]);
-        }
-        Self(matrix)
-    }
-
-    // `zero()` function to create a zero matrix of size `row x col`
-    pub fn zero(row: usize, col: usize) -> Self {
-        Self::from_elem(row, col, T::zero())
-    }
-
-    // `identity()` function to create an identity matrix of size `n x n`
-    pub fn identity(n: usize) -> Self {
-        let mut matrix = Self::zero(n, n);
-        for i in 0..n {
-            matrix.0[i][i] = T::one();
+            matrix.0.push(vec![T::zero(); col]);
         }
         matrix
     }
 
-    // Additional functionality like matrix multiplication can be added here...
-}
-
-pub trait Scalar: Copy + Clone + std::ops::Add<Output = Self> + std::ops::Mul<Output = Self> + Default {
-    fn zero() -> Self;
-    fn one() -> Self;
-}
-
-// Implement Scalar for i32
-impl Scalar for i32 {
-    fn zero() -> Self { 0 }
-    fn one() -> Self { 1 }
-}
-
-// Implement Scalar for f64
-impl Scalar for f64 {
-    fn zero() -> Self { 0.0 }
-    fn one() -> Self { 1.0 }
-}
-
-// Implement Scalar for u32
-impl Scalar for u32 {
-    fn zero() -> Self { 0 }
-    fn one() -> Self { 1 }
+    pub fn identity(n: usize) -> Matrix<T> {
+        let mut matrix = Matrix::new();
+        for y in 0..n {
+            if y > 0 {
+                matrix.0.push(Vec::new());
+            }
+            for x in 0..n {
+                if y == x {
+                    matrix.0[y].push(T::one());
+                } else {
+                    matrix.0[y].push(T::zero());
+                }
+            }
+        }
+        matrix
+    }
 }
