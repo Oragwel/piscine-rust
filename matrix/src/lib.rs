@@ -1,5 +1,5 @@
 // matrix/src/lib.rs
-
+use lalgebra_scalar::Scalar;
 pub struct Matrix<T>(Vec<Vec<T>>);
 
 impl<T: Scalar<Item = T> + Clone> Matrix<T> {
